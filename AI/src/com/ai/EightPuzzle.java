@@ -6,9 +6,9 @@ import java.util.Stack;
 public class EightPuzzle {
     //private static final int ROUND_RAND = 10000;
     private static final int GOAL[] = {1,2,3,4,5,6,7,8,0};
-    private static int PUZZLEINIT[] = new int[GOAL.length];
     private static boolean check = false;
     private static Stack<int[]> stack = new Stack<>();
+    private static String flag = "unknown";
     static int count;
 
     public static void main(String[] args) {
@@ -24,7 +24,6 @@ public class EightPuzzle {
             puzzle = randomPuzzle(GOAL,roundRand);
         }
         //puzzle = new int[]{1, 0, 2, 4, 5, 3, 7, 8, 6};
-        PUZZLEINIT = puzzle;
         System.out.println(puzzle[0]+" "+puzzle[1]+" "+puzzle[2]+" "+puzzle[3]+" "+puzzle[4]+" "+puzzle[5]+" "+puzzle[6]+" "+puzzle[7]+" "+puzzle[8]);
         long tStart = System.currentTimeMillis();
         ids(puzzle);
@@ -51,8 +50,6 @@ public class EightPuzzle {
             stack.push(puzzle);
             return;
         }
-        if(level!=0 && puzzle == PUZZLEINIT)
-            return;
         //System.out.println("Depth = "+level);
         if(isGoal(puzzle)) {
             check = true;
@@ -63,35 +60,48 @@ public class EightPuzzle {
             return;
         }
         int index = -1;
+        String tempFlag = flag;
         for(int i = 0 ; i < puzzle.length ; i++)
             if(puzzle[i] == 0) {
                 index = i;
                 break;
             }
-        if(canUp(index))
-            dls(depth,level+1,up(index,puzzle));
+        if(canUp(index) && !flag.equals("up")) {
+            flag = "down";
+            dls(depth, level + 1, up(index, puzzle));
+        }
         if(check){
             stack.push(puzzle);
             return;
         }
-        if(canDown(index,puzzle))
-            dls(depth,level+1,down(index,puzzle));
+        flag = tempFlag;
+        if(canDown(index,puzzle) && !flag.equals("down")) {
+            flag = "up";
+            dls(depth, level + 1, down(index, puzzle));
+        }
         if(check){
             stack.push(puzzle);
             return;
         }
-        if(canLeft(index))
-            dls(depth,level+1,left(index,puzzle));
+        flag = tempFlag;
+        if(canLeft(index) && !flag.equals("left")) {
+            flag = "right";
+            dls(depth, level + 1, left(index, puzzle));
+        }
         if(check){
             stack.push(puzzle);
             return;
         }
-        if(canRight(index))
-            dls(depth,level+1,right(index,puzzle));
+        flag = tempFlag;
+        if(canRight(index) && !flag.equals("right")) {
+            flag = "left";
+            dls(depth, level + 1, right(index, puzzle));
+        }
         if(check){
             stack.push(puzzle);
             return;
         }
+        flag = tempFlag;
     }
 
     public static boolean isGoal(int[] puzzle){
@@ -104,22 +114,21 @@ public class EightPuzzle {
     }
 
     public static  boolean canLeft(int index){
-        return (index ==0 || index == 3 || index ==6) ? false : true;
+        return !(index ==0 || index == 3 || index ==6);
     }
     public static  boolean canRight(int index){
-        return (index == 2 || index == 5 || index == 8) ? false : true;
+        return !(index == 2 || index == 5 || index == 8);
     }
     public static  boolean canUp(int index){
-        return index - 3 < 0 ? false : true;
+        return index - 3 >= 0;
     }
     public static  boolean canDown(int index,int[] puzzle){
-        return index + 3 >= puzzle.length ? false : true;
+        return index + 3 < puzzle.length;
     }
 
     public static int[] left(int indexOfEmpty,int[] puzzle){
-        if(indexOfEmpty - 1 < 0){
+        if(indexOfEmpty - 1 < 0)
             return puzzle;
-        }
         int newPuzzle[] = new int[puzzle.length];
         System.arraycopy(puzzle,0,newPuzzle,0,puzzle.length);
         int temp;
@@ -129,9 +138,8 @@ public class EightPuzzle {
         return newPuzzle;
     }
     public static int[] right(int indexOfEmpty,int[] puzzle){
-        if(indexOfEmpty + 1 >= puzzle.length){
+        if(indexOfEmpty + 1 >= puzzle.length)
             return puzzle;
-        }
         int newPuzzle[] = new int[puzzle.length];
         System.arraycopy(puzzle,0,newPuzzle,0,puzzle.length);
         int temp;
@@ -141,9 +149,8 @@ public class EightPuzzle {
         return newPuzzle;
     }
     public static int[] up(int indexOfEmpty,int[] puzzle){
-        if(indexOfEmpty - 3 < 0){
+        if(indexOfEmpty - 3 < 0)
             return puzzle;
-        }
         int newPuzzle[] = new int[puzzle.length];
         System.arraycopy(puzzle,0,newPuzzle,0,puzzle.length);
         int temp;
@@ -153,9 +160,8 @@ public class EightPuzzle {
         return newPuzzle;
     }
     public static int[] down(int indexOfEmpty,int[] puzzle){
-        if(indexOfEmpty + 3 >= puzzle.length){
+        if(indexOfEmpty + 3 >= puzzle.length)
             return puzzle;
-        }
         int newPuzzle[] = new int[puzzle.length];
         System.arraycopy(puzzle,0,newPuzzle,0,puzzle.length);
         int temp;
@@ -168,87 +174,77 @@ public class EightPuzzle {
     public static int[] randomPuzzle(int[] goal,int roundRand){
         int random;
         int puzzle[] = new int[9];
-        for(int i = 0 ; i < puzzle.length ; i++){
+        for(int i = 0 ; i < puzzle.length ; i++)
             puzzle[i] = goal[i];
-        }
         for(int j = 0 ; j < roundRand ; j++)
             for(int i = 0 ; i < puzzle.length ; i++){
                 if(puzzle[i] == 0){
                     if(i==0){
                         random = 1+ (int)(Math.random()*2);
-                        if(random == 1) {
+                        if(random == 1)
                             puzzle = right(i,puzzle);
-                        }else{
+                        else
                             puzzle = down(i,puzzle);
-                        }
                     }else if(i==1){
                         random = 1+ (int)(Math.random()*3);
-                        if(random == 1) {
+                        if(random == 1)
                             puzzle = left(i,puzzle);
-                        }else if(random==2){
+                        else if(random==2)
                             puzzle = right(i,puzzle);
-                        }else{
+                        else
                             puzzle = down(i,puzzle);
-                        }
                     }else if(i==2){
                         random = 1+ (int)(Math.random()*2);
-                        if(random == 1) {
+                        if(random == 1)
                             puzzle = left(i,puzzle);
-                        }else{
+                        else
                             puzzle = down(i,puzzle);
-                        }
                     }else if(i==3){
                         random = 1+ (int)(Math.random()*3);
-                        if(random == 1) {
+                        if(random == 1)
                             puzzle = up(i,puzzle);
-                        }else if(random==2){
+                        else if(random==2)
                             puzzle = right(i,puzzle);
-                        }else{
+                        else
                             puzzle = down(i,puzzle);
-                        }
                     }else if(i==4){
                         random = 1+ (int)(Math.random()*4);
-                        if(random == 1) {
+                        if(random == 1)
                             puzzle = up(i,puzzle);
-                        }else if(random==2){
+                        else if(random==2)
                             puzzle = left(i,puzzle);
-                        }else if(random==3){
+                        else if(random==3)
                             puzzle = right(i,puzzle);
-                        }else{
+                        else
                             puzzle = down(i,puzzle);
-                        }
                     }else if(i==5){
                         random = 1+ (int)(Math.random()*3);
-                        if(random == 1) {
+                        if(random == 1)
                             puzzle = up(i,puzzle);
-                        }else if(random==2){
+                        else if(random==2)
                             puzzle = left(i,puzzle);
-                        }else{
+                        else
                             puzzle = down(i,puzzle);
-                        }
                     }else if(i==6){
                         random = 1+ (int)(Math.random()*2);
-                        if(random == 1) {
+                        if(random == 1)
                             puzzle = up(i,puzzle);
-                        }else{
+                        else
                             puzzle = right(i,puzzle);
-                        }
                     }else if(i==7){
                         random = 1+ (int)(Math.random()*3);
-                        if(random == 1) {
+                        if(random == 1)
                             puzzle = up(i,puzzle);
-                        }else if(random==2){
+                        else if(random==2)
                             puzzle = left(i,puzzle);
-                        }else{
+                        else
                             puzzle = right(i,puzzle);
-                        }
                     }else{
                         random = 1+ (int)(Math.random()*2);
-                        if(random == 1) {
+                        if(random == 1)
                             puzzle = up(i,puzzle);
-                        }else{
+                        else
                             puzzle = right(i,puzzle);
-                        }
                     }
                 }
             }
@@ -263,20 +259,18 @@ public class EightPuzzle {
         String puzzleSt = sc.next();
         System.out.println();
         char[] charArray = puzzleSt.toCharArray();
-        for(int i = 0 ; i < puzzle.length ; i++){
+        for(int i = 0 ; i < puzzle.length ; i++)
             puzzle[i] = Character.getNumericValue(charArray[i]);
-        }
         return puzzle;
     }
 
     public static String[] itos(int[] array){
         String result[] = new String[array.length];
-        for(int i = 0 ; i < array.length ; i++){
+        for(int i = 0 ; i < array.length ; i++)
             if(array[i] == 0)
                 result[i] = " ";
             else
                 result[i] = Integer.toString(array[i]);
-        }
         return result;
     }
 
