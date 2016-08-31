@@ -1,15 +1,16 @@
 package com.ai;
 
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.Scanner;
 import java.util.Stack;
 
 public class EightPuzzle {
-    //private static final int ROUND_RAND = 10000;
     private static final int GOAL[] = {1,2,3,4,5,6,7,8,0};
-    private static boolean check = false;
-    private static Stack<int[]> stack = new Stack<>();
-    private static String flag = "unknown";
-    static int count;
+    private static boolean check = false; //check that solution meet goal?
+    private static Stack<int[]> stack = new Stack<>(); //keep solution from root to goal.
+    private static String flag = "unknown"; //flag check that leaves is duplicate any parent.
+    private static int count; //count moves until goal.
 
     public static void main(String[] args) {
         int puzzle[] ;
@@ -23,96 +24,94 @@ public class EightPuzzle {
             roundRand = Sc.nextInt();
             puzzle = randomPuzzle(GOAL,roundRand);
         }
-        //puzzle = new int[]{1, 0, 2, 4, 5, 3, 7, 8, 6};
-        System.out.println(puzzle[0]+" "+puzzle[1]+" "+puzzle[2]+" "+puzzle[3]+" "+puzzle[4]+" "+puzzle[5]+" "+puzzle[6]+" "+puzzle[7]+" "+puzzle[8]);
-        long tStart = System.currentTimeMillis();
+        long tStart = System.currentTimeMillis(); //for check time.
         ids(puzzle);
-        long tEnd = System.currentTimeMillis();
-        long tDelta = tEnd - tStart;
-        double elapsedSeconds = tDelta / 1000.0;
-        while (!stack.empty())
+        long tEnd = System.currentTimeMillis(); //for check time.
+        long tDelta = tEnd - tStart; //for check time.
+        double elapsedSeconds = tDelta / 1000.0; //for check time.
+        while (!stack.empty()) //print solution.
             print(stack.pop());
-        System.out.println(elapsedSeconds);
+        System.out.println(elapsedSeconds + " sec."); //for check time.
     }
 
+    //Iterative Deepening Search
     public static void ids(int[] puzzle){
         int depth = 0;
         int level = 0;
         while(!check){
-            System.out.println("Depth = "+depth);
             dls(depth,level,puzzle);
             depth++;
         }
     }
 
+    //Depth Limited Search
     public static void dls(int depth,int level,int[] puzzle){
-        if(check) {
+        if(check) { //if puzzle meet goal push that state in stack.
             stack.push(puzzle);
             return;
         }
-        //System.out.println("Depth = "+level);
-        if(isGoal(puzzle)) {
+        if(isGoal(puzzle)) {//if puzzle meet goal change check to true and push that state in stack.
             check = true;
             stack.push(puzzle);
             return;
         }
-        if(depth <= level){
+        if(depth <= level){ //if level >= depth exit function go out to + max depth
             return;
         }
-        int index = -1;
-        String tempFlag = flag;
-        for(int i = 0 ; i < puzzle.length ; i++)
+        int index = -1; //initial index of " "
+        String tempFlag = flag; //set flag
+        for(int i = 0 ; i < puzzle.length ; i++) //find index of " "
             if(puzzle[i] == 0) {
                 index = i;
                 break;
             }
-        if(canUp(index) && !flag.equals("up")) {
-            flag = "down";
+        if(canUp(index) && !flag.equals("up")) { //check that " " can up and flag isn't equals "up".
+            flag = "down"; //change flag to flag for next level.
             dls(depth, level + 1, up(index, puzzle));
         }
-        if(check){
+        if(check){ //if puzzle meet goal push that state in stack.
             stack.push(puzzle);
             return;
         }
-        flag = tempFlag;
-        if(canDown(index,puzzle) && !flag.equals("down")) {
-            flag = "up";
+        flag = tempFlag; //set flag to flag for this level depth
+        if(canDown(index,puzzle) && !flag.equals("down")) { //check that " " can up and flag isn't equals "down".
+            flag = "up"; //change flag to flag for next level.
             dls(depth, level + 1, down(index, puzzle));
         }
-        if(check){
+        if(check){ //if puzzle meet goal push that state in stack.
             stack.push(puzzle);
             return;
         }
-        flag = tempFlag;
-        if(canLeft(index) && !flag.equals("left")) {
-            flag = "right";
+        flag = tempFlag; //set flag to flag for this level depth
+        if(canLeft(index) && !flag.equals("left")) { //check that " " can up and flag isn't equals "left".
+            flag = "right"; //change flag to flag for next level.
             dls(depth, level + 1, left(index, puzzle));
         }
-        if(check){
+        if(check){ //if puzzle meet goal push that state in stack.
             stack.push(puzzle);
             return;
         }
-        flag = tempFlag;
-        if(canRight(index) && !flag.equals("right")) {
-            flag = "left";
+        flag = tempFlag; //set flag to flag for this level depth
+        if(canRight(index) && !flag.equals("right")) { //check that " " can up and flag isn't equals "right".
+            flag = "left"; //change flag to flag for next level.
             dls(depth, level + 1, right(index, puzzle));
         }
-        if(check){
+        if(check){ //if puzzle meet goal push that state in stack.
             stack.push(puzzle);
             return;
         }
-        flag = tempFlag;
+        flag = tempFlag; //set flag to flag for this level depth
     }
 
+    //check puzzle meet goal?
     public static boolean isGoal(int[] puzzle){
-        //print(puzzle);
         for(int i = 0 ; i < GOAL.length ; i++){
             if(puzzle[i] != GOAL[i])
                 return false;
         }
         return true;
     }
-
+    //check " " direction which can go?
     public static  boolean canLeft(int index){
         return !(index ==0 || index == 3 || index ==6);
     }
@@ -126,6 +125,7 @@ public class EightPuzzle {
         return index + 3 < puzzle.length;
     }
 
+    //move " " in puzzle go left.
     public static int[] left(int indexOfEmpty,int[] puzzle){
         if(indexOfEmpty - 1 < 0)
             return puzzle;
@@ -137,6 +137,7 @@ public class EightPuzzle {
         newPuzzle[indexOfEmpty - 1] = temp;
         return newPuzzle;
     }
+    //move " " in puzzle go right.
     public static int[] right(int indexOfEmpty,int[] puzzle){
         if(indexOfEmpty + 1 >= puzzle.length)
             return puzzle;
@@ -148,6 +149,7 @@ public class EightPuzzle {
         newPuzzle[indexOfEmpty + 1] = temp;
         return newPuzzle;
     }
+    //move " " in puzzle up.
     public static int[] up(int indexOfEmpty,int[] puzzle){
         if(indexOfEmpty - 3 < 0)
             return puzzle;
@@ -159,6 +161,7 @@ public class EightPuzzle {
         newPuzzle[indexOfEmpty - 3] = temp;
         return newPuzzle;
     }
+    //move " "  in puzzle down.
     public static int[] down(int indexOfEmpty,int[] puzzle){
         if(indexOfEmpty + 3 >= puzzle.length)
             return puzzle;
@@ -171,6 +174,7 @@ public class EightPuzzle {
         return newPuzzle;
     }
 
+    //random puzzle mode.
     public static int[] randomPuzzle(int[] goal,int roundRand){
         int random;
         int puzzle[] = new int[9];
@@ -251,6 +255,7 @@ public class EightPuzzle {
         return puzzle;
     }
 
+    //insert puzzle mode.
     public static int[] insertPuzzle(){
         int puzzle[] = new int[GOAL.length];
         System.out.println("Please enter puzzle 9 numbers(0-8) (place empty with 0)");
@@ -264,6 +269,7 @@ public class EightPuzzle {
         return puzzle;
     }
 
+    //convert interger[] to string[] and replace 0 with " "
     public static String[] itos(int[] array){
         String result[] = new String[array.length];
         for(int i = 0 ; i < array.length ; i++)
@@ -274,10 +280,22 @@ public class EightPuzzle {
         return result;
     }
 
+    //print puzzle at current state.
     public static void print(int[] puzzle){
-//        System.out.println("Please enter to continue...");
-//        Scanner sc = new Scanner(System.in);
-//        sc.nextLine();
+        //enable this to press enter to show step to step.
+//        try {
+//            System.out.println("Please enter to continue...");
+//            Scanner sc = new Scanner(System.in);
+//            sc.nextLine();
+//            Robot robot = new Robot();
+//            robot.keyPress(KeyEvent.VK_CONTROL);
+//            robot.keyPress(KeyEvent.VK_SEMICOLON);
+//            robot.keyRelease(KeyEvent.VK_CONTROL);
+//            robot.keyRelease(KeyEvent.VK_SEMICOLON);
+//            robot.delay(100);
+//        } catch (AWTException e) {
+//            e.printStackTrace();
+//        }
         String puzzleString[] = itos(puzzle);
         if(count!=0)
             System.out.println("Count = "+count);
