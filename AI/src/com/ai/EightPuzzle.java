@@ -24,14 +24,16 @@ public class EightPuzzle {
             roundRand = Sc.nextInt();
             puzzle = randomPuzzle(GOAL,roundRand);
         }
-        long tStart = System.currentTimeMillis(); //for check time.
-        ids(puzzle);
-        long tEnd = System.currentTimeMillis(); //for check time.
-        long tDelta = tEnd - tStart; //for check time.
-        double elapsedSeconds = tDelta / 1000.0; //for check time.
-        while (!stack.empty()) //print solution.
-            print(stack.pop());
-        System.out.println(elapsedSeconds + " sec."); //for check time.
+        print(puzzle);
+        System.out.println(findDistance(puzzle));
+//        long tStart = System.currentTimeMillis(); //for check time.
+//        ids(puzzle);
+//        long tEnd = System.currentTimeMillis(); //for check time.
+//        long tDelta = tEnd - tStart; //for check time.
+//        double elapsedSeconds = tDelta / 1000.0; //for check time.
+//        while (!stack.empty()) //print solution.
+//            print(stack.pop());
+//        System.out.println(elapsedSeconds + " sec."); //for check time.
     }
 
     //Iterative Deepening Search
@@ -309,5 +311,55 @@ public class EightPuzzle {
         System.out.println("| " + puzzleString[6] + " | " + puzzleString[7] + " | " + puzzleString[8] + " |");
         System.out.println("  -   -   -  \n");
         count++;
+    }
+
+    public static int findDistance(int[] puzzle){
+        int distance = 0;
+        int indexGoal = -1;
+        int coordinatePuzzle[] = new int[2];
+        int coordinateGoal[] = new int[2];
+        for(int i = 0 ; i < puzzle.length ; i++){
+            for(int j = 0 ; j < GOAL.length ; j++){
+                if(puzzle[i] == GOAL[j])
+                    indexGoal = j;
+            }
+            coordinatePuzzle = fineCoordinate(i);
+            coordinateGoal = fineCoordinate(indexGoal);
+            distance += (Math.abs(coordinatePuzzle[0]-coordinateGoal[0]) + Math.abs(coordinatePuzzle[1]-coordinateGoal[1]));
+        }
+        return distance;
+    }
+
+    public static int[] fineCoordinate(int index){
+        int coordinate[] = new int[2];
+        if(index == 0){
+            coordinate[0] = -1;
+            coordinate[1] = 1;
+        }else if(index == 1){
+            coordinate[0] = 0;
+            coordinate[1] = 1;
+        }else if(index == 2){
+            coordinate[0] = 1;
+            coordinate[1] = 1;
+        }else if(index == 3){
+            coordinate[0] = -1;
+            coordinate[1] = 0;
+        }else if(index == 4){
+            coordinate[0] = 0;
+            coordinate[1] = 0;
+        }else if(index == 5){
+            coordinate[0] = 1;
+            coordinate[1] = 0;
+        }else if(index == 6){
+            coordinate[0] = -1;
+            coordinate[1] = -1;
+        }else if(index == 7){
+            coordinate[0] = 0;
+            coordinate[1] = -1;
+        }else{
+            coordinate[0] = 1;
+            coordinate[1] = -1;
+        }
+        return coordinate;
     }
 }
