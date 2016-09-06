@@ -24,16 +24,20 @@ public class EightPuzzle {
             roundRand = Sc.nextInt();
             puzzle = randomPuzzle(GOAL,roundRand);
         }
-        print(puzzle);
-        System.out.println(findDistance(puzzle));
-//        long tStart = System.currentTimeMillis(); //for check time.
-//        ids(puzzle);
-//        long tEnd = System.currentTimeMillis(); //for check time.
-//        long tDelta = tEnd - tStart; //for check time.
-//        double elapsedSeconds = tDelta / 1000.0; //for check time.
-//        while (!stack.empty()) //print solution.
-//            print(stack.pop());
-//        System.out.println(elapsedSeconds + " sec."); //for check time.
+//        print(puzzle);
+//        System.out.println(findWorngTiles(puzzle));
+        long tStart = System.currentTimeMillis(); //for check time.
+        ids(puzzle);
+        long tEnd = System.currentTimeMillis(); //for check time.
+        long tDelta = tEnd - tStart; //for check time.
+        double elapsedSeconds = tDelta / 1000.0; //for check time.
+        while (!stack.empty()) //print solution.
+            print(stack.pop());
+        System.out.println(elapsedSeconds + " sec."); //for check time.
+    }
+
+    public static void aStar(int[] puzzle){
+
     }
 
     //Iterative Deepening Search
@@ -316,8 +320,8 @@ public class EightPuzzle {
     public static int findDistance(int[] puzzle){
         int distance = 0;
         int indexGoal = -1;
-        int coordinatePuzzle[] = new int[2];
-        int coordinateGoal[] = new int[2];
+        int coordinatePuzzle[];
+        int coordinateGoal[];
         for(int i = 0 ; i < puzzle.length ; i++){
             for(int j = 0 ; j < GOAL.length ; j++){
                 if(puzzle[i] == GOAL[j])
@@ -361,5 +365,14 @@ public class EightPuzzle {
             coordinate[1] = -1;
         }
         return coordinate;
+    }
+
+    public static int findWorngTiles(int[] puzzle){
+        int wrongTiles = 0;
+        for(int i = 0 ; i < puzzle.length ; i++){
+            if(puzzle[i]!=GOAL[i])
+                wrongTiles++;
+        }
+        return wrongTiles;
     }
 }
