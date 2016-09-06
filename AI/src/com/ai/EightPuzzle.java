@@ -299,6 +299,8 @@ public class EightPuzzle {
         String puzzleString[] = itos(puzzle);
         if(count!=0)
             System.out.println("Count = "+count);
+        else
+            System.out.println("\nInitial Puzzle");
         System.out.println("  -   -   -  ");
         System.out.println("| " + puzzleString[0] + " | " + puzzleString[1] + " | " + puzzleString[2] + " |");
         System.out.println("| -   -   - |");
