@@ -5,10 +5,11 @@ import lombok.Setter;
 import java.util.*;
 
 @Setter
-@Getter
+@Getter //auto-gen method setter and getter for this class
 class Problem {
     int puzzle[];
-    int fn;
+    int fn = 0;
+    int gn = 0;
     Problem parent;
     public Problem(int[] puzzle){
         this.puzzle = puzzle;
@@ -66,12 +67,13 @@ public class EightPuzzle {
             }
         });
         Set<String> passed = new HashSet<String>(); //set of passed path
-        int gn = 0; //cost of the path so far
+        int gn; //cost of the path so far
         int index = -1; //initial index of " "
         Problem current;
         queue.add(new Problem(puzzle));
         while (true) {
             current = queue.poll();
+            gn = current.getGn();
             if(current==null) //check that queue is null?
                 break;
             if(isGoal(current.puzzle)) //check that puzzle meet goal?
@@ -84,41 +86,34 @@ public class EightPuzzle {
                 }
             if (canUp(index)) { //check that " " can up
                 Problem up = new Problem(up(index, current.puzzle));
-                if(!passed.contains(up.toString())) { //check that path is passed? if not then set f(n) value , parent and added to queue
-                    up.setFn(gn + findWorngTiles(up.puzzle));
-                    up.setParent(current);
-                    queue.add(up);
-                }
+                setAndAddToQ(queue,passed,up,current,gn);
             }
             if (canDown(index, current.puzzle)) { //check that " " can down
                 Problem down = new Problem(down(index, current.puzzle));
-                if(!passed.contains(down.toString())) { //check that path is passed? if not then set f(n) value , parent and added to queue
-                    down.setFn(gn + findWorngTiles(down.puzzle));
-                    down.setParent(current);
-                    queue.add(down);
-                }
+                setAndAddToQ(queue,passed,down,current,gn);
             }
             if (canLeft(index)) { //check that " " can left
                 Problem left = new Problem(left(index, current.puzzle));
-                if(!passed.contains(left.toString())) { //check that path is passed? if not then set f(n) value , parent and added to queue
-                    left.setFn(gn + findWorngTiles(left.puzzle));
-                    left.setParent(current);
-                    queue.add(left);
-                }
+                setAndAddToQ(queue,passed,left,current,gn);
             }
             if (canRight(index)) { //check that " " can right
                 Problem right = new Problem(right(index, current.puzzle));
-                if(!passed.contains(right.toString())){ //check that path is passed? if not then set f(n) value , parent and added to queue
-                    right.setFn(gn + findWorngTiles(right.puzzle));
-                    right.setParent(current);
-                    queue.add(right);
-                }
+                setAndAddToQ(queue,passed,right,current,gn);
             }
-            gn++; //increased value of g(n)
         }
         while (current != null) {
             stack.push(current.getPuzzle());
             current = current.getParent();
+        }
+    }
+
+    public static void setAndAddToQ(PriorityQueue queue,Set passed,Problem problem,Problem parent,int gn){
+        if(!passed.contains(problem.toString())){ //check that path is passed? if not then set f(n) value , parent and added to queue
+            gn++; //add cost of the path
+            problem.setGn(gn); //set cost
+            problem.setFn(gn + findWorngTiles(problem.puzzle)); //set fn
+            problem.setParent(parent); //set parent
+            queue.add(problem); //add to queue
         }
     }
 
