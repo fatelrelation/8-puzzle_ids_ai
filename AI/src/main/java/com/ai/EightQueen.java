@@ -1,6 +1,10 @@
 package com.ai;
+
+import java.util.HashSet;
+import java.util.Set;
+
 public class EightQueen {
-    private final static int MAXTEMP = 1000000; //for Schedule
+    private final static int MAXTEMP = 100; //for Schedule
     public static void main(String args[]){
         int table[][] = initTable();
         printTable(table);
@@ -16,6 +20,7 @@ public class EightQueen {
         current = copyArray(table);
         for(double t = 1.0 ; t <Integer.MAX_VALUE ; t *= 1.001){ //t(time) will slowly increasing cause temp will slowly decreasing in next line.
             temp = MAXTEMP / t; //Schedule
+            System.out.println(temp);
             if(temp < 0.001) //check temp for return current.
                 break;
             if(checkNumQAtk(current) == 0) //if find the goal will return current table.
@@ -53,22 +58,68 @@ public class EightQueen {
             if(count == randomQueen)
                 break;
         }
-        int randomSuccessor;
-        int modrandomSuccessor;
-        while(true) { ///find new location for Q.
-            randomSuccessor = (int) (Math.random() * 64);
-            modrandomSuccessor = (randomSuccessor % 8);
-            randomSuccessor = (randomSuccessor / 8);
-            if(successor[randomSuccessor][modrandomSuccessor] == 0) {
+        Set<int[]> moveAvailable = findQueenMoveAvailable(successor,x,y);
+        int randomMove = (int)(Math.random() * moveAvailable.size());
+        count = 0;
+        for (int[] move : moveAvailable) {
+            if (count == randomMove) {
                 successor[y][x] = 0;
-                successor[randomSuccessor][modrandomSuccessor] = 1;
+                successor[move[0]][move[1]] = 1;
                 break;
             }
+            count++;
         }
-        //printTable(successor);
         return successor;
     }
-
+    //find set of position that available for queen to move.
+    public static Set<int[]> findQueenMoveAvailable(int[][] table, int indexX, int indexY){
+        Set<int[]> moveAvailable = new HashSet<int[]>();
+        int originIndexX = indexX;
+        int originIndexY = indexY;
+        indexX = originIndexX - 1;
+        indexY = originIndexY - 1;
+        while(indexY > -1 && indexY < 8 && indexX > -1 && indexX < 8 ){ //y - 1 , x - 1   (north-west)
+            if(table[indexY][indexX] == 0)
+                moveAvailable.add(new int[]{indexY,indexX});
+            indexY--;indexX--;
+        }
+        indexY = originIndexY - 1;
+        indexX = originIndexX + 1;
+        while(indexY > -1 && indexY < 8 && indexX > -1 && indexX < 8 ){ //y - 1 , x + 1   (north-east)
+            if(table[indexY][indexX] == 0)
+                moveAvailable.add(new int[]{indexY,indexX});
+            indexY--;indexX++;
+        }
+        indexY = originIndexY + 1;
+        indexX = originIndexX - 1;
+        while(indexY > -1 && indexY < 8 && indexX > -1 && indexX < 8 ){ //y + 1 , x - 1   (south-west)
+            if(table[indexY][indexX] == 0)
+                moveAvailable.add(new int[]{indexY,indexX});
+            indexY++;indexX--;
+        }
+        indexY = originIndexY + 1;
+        indexX = originIndexX + 1;
+        while(indexY > -1 && indexY < 8 && indexX > -1 && indexX < 8 ){ //y + 1 , x + 1   (south-east)
+            if(table[indexY][indexX] == 0)
+                moveAvailable.add(new int[]{indexY,indexX});
+            indexY++;indexX++;
+        }
+        indexY = 0;
+        indexX = originIndexX;
+        while(indexY < 8){                                                            //(north-south)
+            if(table[indexY][indexX] == 0 && indexY != originIndexY)
+                moveAvailable.add(new int[]{indexY,indexX});
+            indexY++;
+        }
+        indexY = originIndexY;
+        indexX = 0;
+        while(indexX < 8){                                                            //(west-east)
+            if(table[indexY][indexX] == 0 && indexX != originIndexX)
+                moveAvailable.add(new int[]{indexY,indexX});
+            indexX++;
+        }
+        return moveAvailable;
+    }
     //initial table (problem) 8-Queen
     public static int[][] initTable(){
         int table[][] = new int[8][8];
